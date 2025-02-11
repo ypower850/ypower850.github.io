@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS 문의</title>
+    <script>
+        window.onload = function () {
+            var urlParams = new URLSearchParams(window.location.search);
+            var param = urlParams.get("param") || "1"; // 기본값 1
+            var phoneNumber = "01065382928";
+
+            // param 값에 따라 문자 내용 변경
+            var messageMap = {
+                "1": "1번",
+                "2": "오메가",
+                "3": "윤프로",
+                "4": "김요한",
+            };
+            var message = messageMap[param] || messageMap["1"];
+
+            var encodedMessage = encodeURIComponent(message);
+
+            var userAgent = navigator.userAgent.toLowerCase();
+            var isMobile = /iphone|ipad|ipod|android/i.test(userAgent);
+            var isIOS = /iphone|ipad|ipod/.test(userAgent);
+            var smsLink = isIOS
+                ? `sms:${phoneNumber}&body=${encodedMessage}`
+                : `sms:${phoneNumber}?body=${encodedMessage}`;
+
+            if (isMobile) {
+                window.location.href = smsLink;
+            } else {
+                document.getElementById("message").innerText = "이 기능은 모바일에서만 사용 가능합니다.";
+                document.getElementById("backButton").style.display = "block";
+            }
+        };
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</head>
+<body>
+    <p id="message">문자 메시지 앱을 여는 중...</p>
+    <button id="backButton" style="display:none;" onclick="goBack()">돌아가기</button>
+</body>
+</html>
