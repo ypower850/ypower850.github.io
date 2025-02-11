@@ -6,6 +6,7 @@
     <title>SMS 문의</title>
     <script>
         window.onload = function () {
+            debugger;
             var urlParams = new URLSearchParams(window.location.search);
             var param = urlParams.get("param") || "1"; // 기본값 1
             var phoneNumber = "01065382928";
