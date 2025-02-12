@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMS 문의</title>
+    <title>SMS 자동 생성</title>
     <script>
-        window.onload = function () {
-            var urlParams = new URLSearchParams(window.location.search);
-            var param = urlParams.get("p") || "1"; // 기본값 1
-            var phoneNumber = "01065382928";
+        async function loadSMSData() {
+            try {
+                const response = await fetch("sms.json");
+                const data = await response.json();
 
-            var messageMap = {
-                "1": "1번",
-                "2": "오메가",
-                "3": "윤프로",
-                "4": "김요한",
-            };
-            var message = messageMap[param] || messageMap["1"];
+                const urlParams = new URLSearchParams(window.location.search);
+                const param = urlParams.get("p") || "1"; 
+                const phoneNumber = data.phoneNumber;
+                const message = data.messages[param];
 
-            var encodedMessage = encodeURIComponent(message);
+                const encodedMessage = encodeURIComponent(message);
 
-            var userAgent = navigator.userAgent.toLowerCase();
-            var isMobile = /iphone|ipad|ipod|android/i.test(userAgent);
-            var isIOS = /iphone|ipad|ipod/.test(userAgent);
-            var smsLink = isIOS
-                ? `sms:${phoneNumber}&body=${encodedMessage}`
-                : `sms:${phoneNumber}?body=${encodedMessage}`;
+                // 디바이스 체크
+                const userAgent = navigator.userAgent.toLowerCase();
+                const isMobile = /iphone|ipad|ipod|android/i.test(userAgent);
+                const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
-            if (isMobile) {
-                window.location.href = smsLink;
-            } else {
-                document.getElementById("message").innerText = "이 기능은 모바일에서만 사용 가능합니다.";
-                document.getElementById("backButton").style.display = "block";
+                // SMS 링크 생성
+                const smsLink = isIOS
+                    ? `sms:${phoneNumber}&body=${encodedMessage}`
+                    : `sms:${phoneNumber}?body=${encodedMessage}`;
+
+                if (isMobile) {
+                    window.location.href = smsLink;
+                } else {
+                    document.getElementById("message").innerText = "이 기능은 모바일에서만 사용 가능합니다.";
+                    document.getElementById("backButton").style.display = "block";
+                }
+            } catch (error) {
+                console.error("JSON 로드 오류:", error);
+                document.getElementById("message").innerText = "설정 파일을 불러올 수 없습니다.";
             }
-        };
+        }
 
         function goBack() {
             window.history.back();
         }
+
+        window.onload = loadSMSData;
     </script>
 </head>
 <body>
